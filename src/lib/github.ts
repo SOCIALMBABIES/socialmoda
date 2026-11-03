@@ -116,6 +116,8 @@ async function request(cfg: GhConfig, path: string, init: RequestInit = {}): Pro
   let res: Response;
   try {
     res = await fetch(API + path, {
+      // GitHub answers GETs with max-age=60: without this a stale file sha is reused and writes fail with 409
+      cache: 'no-store',
       ...init,
       headers: {
         Accept: 'application/vnd.github+json',
@@ -194,16 +196,21 @@ export async function putFile(cfg: GhConfig, path: string, contentBase64: string
     const json = (await res.json()) as { content: { sha: string } };
     return { sha: json.content.sha };
   };
-  try {
-    return await attempt(sha);
-  } catch (e) {
-    // Stale or missing sha: look up the current one and retry once
-    if (e instanceof GitHubError && (e.status === 409 || e.status === 422)) {
-      const meta = await request(cfg, `${repoPath(cfg)}/contents/${encodePath(path)}?ref=${encodeURIComponent(cfg.branch)}`).then((r) => r.json()).catch(() => null);
-      const fresh = (meta as { sha?: string } | null)?.sha;
-      if (fresh && fresh !== sha) return attempt(fresh);
+  // 409/422 means the file changed since we read its sha (or two commits hit the branch at once).
+  // Re-read the current sha and retry a few times with a short pause.
+  let useSha = sha;
+  for (let i = 0; ; i++) {
+    try {
+      return await attempt(useSha);
+    } catch (e) {
+      const conflict = e instanceof GitHubError && (e.status === 409 || e.status === 422);
+      if (!conflict || i >= 3) throw e;
+      await new Promise((r) => setTimeout(r, 600 * (i + 1)));
+      const meta = await request(cfg, `${repoPath(cfg)}/contents/${encodePath(path)}?ref=${encodeURIComponent(cfg.branch)}`)
+        .then((r) => r.json())
+        .catch(() => null);
+      useSha = (meta as { sha?: string } | null)?.sha;
     }
-    throw e;
   }
 }
 
