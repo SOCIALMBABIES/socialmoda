@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-03T19:33:29.628Z",
+  "updatedAt": "2026-11-03T19:33:43.093Z",
   "products": [
     {
       "id": "p_008",
@@ -54,9 +54,9 @@
         "assets/products/shearling-aviator-jacket-2.svg",
         "assets/products/shearling-aviator-jacket-3.svg"
       ],
-      "status": "draft",
+      "status": "published",
       "createdAt": "2025-04-22T09:00:00.000Z",
-      "updatedAt": "2025-04-22T09:00:00.000Z"
+      "updatedAt": "2026-11-03T19:33:43.523Z"
     }
   ]
 }
