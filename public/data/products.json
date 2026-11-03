@@ -1,30 +1,6 @@
 {
-  "updatedAt": "2026-11-03T19:28:27.136Z",
+  "updatedAt": "2026-11-03T19:32:35.520Z",
   "products": [
-    {
-      "id": "p_mw0s7gww98oq9",
-      "slug": "deneme",
-      "name": "Deneme",
-      "sku": "SM-0SNL-342",
-      "price": 280,
-      "salePrice": null,
-      "shortDescription": "",
-      "description": "",
-      "specs": [],
-      "sizes": [
-        "S",
-        "M",
-        "L",
-        "XL"
-      ],
-      "colors": [],
-      "images": [
-        "local/k2026-ea-8-10-11-mw0s7gws.webp"
-      ],
-      "status": "published",
-      "createdAt": "2026-11-03T14:27:02.624Z",
-      "updatedAt": "2026-11-03T14:27:02.624Z"
-    },
     {
       "id": "p_001",
       "slug": "classic-black-leather-jacket",
