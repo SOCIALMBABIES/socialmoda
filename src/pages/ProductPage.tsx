@@ -71,7 +71,7 @@ export default function ProductPage() {
       <section className="sm-section !pb-0" style={{ paddingTop: 'calc(var(--section-y) * 0.45)' }}>
         <div className="sm-container">
           <Link to="/shop" className="mb-8 inline-flex items-center gap-2 text-[0.78rem] uppercase tracking-[0.18em] opacity-70 transition hover:opacity-100">
-            <ArrowLeft size={15} aria-hidden="true" /> Back to collection
+            <ArrowLeft size={15} aria-hidden="true" /> {config.pages.product.backLink}
           </Link>
 
           {product.status === 'draft' && (
@@ -207,7 +207,7 @@ export default function ProductPage() {
 
               <div className="space-y-3 pt-1">
                 <ButtonLink href={`/contact?${enquiry.toString()}`} variant="primary" className="w-full sm:w-auto">
-                  Enquire about this jacket
+                  {config.pages.product.enquireButton}
                 </ButtonLink>
                 <p className="text-[0.82rem] opacity-60">Online ordering is not open yet. Send us your size and colour and we will reply personally.</p>
               </div>
@@ -245,7 +245,7 @@ export default function ProductPage() {
         <section className="sm-section" aria-labelledby="related-title">
           <div className="sm-container">
             <h2 id="related-title" className="mb-10 text-[clamp(1.9rem,3.6vw,2.8rem)]">
-              You may also like
+              {config.pages.product.relatedTitle}
             </h2>
             <ProductGrid products={related} />
           </div>

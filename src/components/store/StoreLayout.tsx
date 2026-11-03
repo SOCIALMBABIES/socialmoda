@@ -63,9 +63,26 @@ export default function StoreLayout() {
     return () => window.removeEventListener('message', onMessage);
   }, [isPreview, navigate]);
 
+  // In the editor preview, clicking any editable text or image asks the editor to open its control
+  useEffect(() => {
+    if (!isPreview) return;
+    const onClick = (e: MouseEvent) => {
+      const el = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-edit]');
+      if (!el) return;
+      e.preventDefault();
+      e.stopPropagation();
+      window.parent.postMessage({ type: 'sm-edit', path: el.dataset.edit }, window.location.origin);
+    };
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
+  }, [isPreview]);
+
   return (
     <div className="sm-store">
       <style>{css}</style>
+      {isPreview && (
+        <style>{`[data-edit]{cursor:pointer}[data-edit]:hover{outline:2px dashed #b45309;outline-offset:4px}`}</style>
+      )}
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-white focus:px-4 focus:py-2 focus:text-black"

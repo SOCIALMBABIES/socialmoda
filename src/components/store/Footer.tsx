@@ -18,7 +18,7 @@ export default function Footer() {
           <Link to="/" aria-label={`${config.brand.name} home`} className="inline-block text-white/95">
             <BrandMark />
           </Link>
-          <p className="max-w-sm text-[0.94rem] leading-relaxed opacity-80">{f.about}</p>
+          <p data-edit="footer.about" className="max-w-sm text-[0.94rem] leading-relaxed opacity-80">{f.about}</p>
           {f.social.length > 0 && (
             <ul className="flex flex-wrap gap-2.5 pt-1" aria-label="Social media">
               {f.social.map((s) => (

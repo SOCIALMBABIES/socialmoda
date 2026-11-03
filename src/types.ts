@@ -103,8 +103,11 @@ export interface SiteConfig {
   };
   contact: { email: string; phone: string; address: string; hours: string; formEndpoint: string };
   pages: {
-    about: { title: string; intro: string; body: string; image: string; highlights: Highlight[] };
+    home: { storyButton: string };
+    shop: { title: string; intro: string };
+    about: { title: string; intro: string; body: string; image: string; highlights: Highlight[]; ctaTitle: string; ctaButton: string };
     contact: { title: string; intro: string };
+    product: { enquireButton: string; backLink: string; relatedTitle: string };
   };
   layout: {
     maxWidth: number;

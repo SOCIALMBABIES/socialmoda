@@ -12,7 +12,7 @@ export function BrandMark({ className }: { className?: string }) {
     <span className={cn('flex items-center gap-3', className)}>
       {b.logo && <SmartImage src={b.logo} alt={`${b.name} logo`} fit="contain" eager style={{ height: b.logoHeight, width: b.logoHeight * 3.2 }} className="shrink-0" repoHint={config.repo} />}
       {(!b.logo || b.showNameWithLogo) && (
-        <span className="font-heading text-[1.55rem] uppercase leading-none tracking-[0.22em]" style={{ fontWeight: 600 }}>
+        <span data-edit="brand.name" className="font-heading text-[1.55rem] uppercase leading-none tracking-[0.22em]" style={{ fontWeight: 600 }}>
           {b.name}
         </span>
       )}

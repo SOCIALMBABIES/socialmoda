@@ -91,7 +91,12 @@ export const DEFAULT_CONFIG: SiteConfig = {
     formEndpoint: '',
   },
   pages: {
+    home: { storyButton: 'Our story' },
+    shop: { title: 'All Jackets', intro: 'Every jacket in the collection, made to be worn for years.' },
+    product: { enquireButton: 'Enquire about this jacket', backLink: 'Back to collection', relatedTitle: 'You may also like' },
     about: {
+      ctaTitle: 'Find your jacket',
+      ctaButton: 'Explore the collection',
       title: 'About SocialModa',
       intro: 'A leather house built on patience, restraint and the belief that one great jacket outlasts a hundred average ones.',
       body:

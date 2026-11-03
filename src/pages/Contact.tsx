@@ -73,9 +73,9 @@ export default function Contact() {
     <section className="sm-section">
       <div className="sm-container grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-24">
         <div className="space-y-8">
-          <h1 className="text-[clamp(2.6rem,5.6vw,4.4rem)]">{page.title}</h1>
-          <p className="max-w-md text-[1.05rem] leading-relaxed opacity-75">{page.intro}</p>
-          <ul className="space-y-5 text-[0.98rem]">
+          <h1 data-edit="pages.contact.title" className="text-[clamp(2.6rem,5.6vw,4.4rem)]">{page.title}</h1>
+          <p data-edit="pages.contact.intro" className="max-w-md text-[1.05rem] leading-relaxed opacity-75">{page.intro}</p>
+          <ul data-edit="contact.email" className="space-y-5 text-[0.98rem]">
             {c.email && (
               <li className="flex items-start gap-4">
                 <Mail size={19} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />

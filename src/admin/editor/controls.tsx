@@ -1,4 +1,4 @@
-import { createContext, useContext, useId, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useId, useState, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, FolderOpen, Plus, Trash2, X } from 'lucide-react';
 import type { SiteConfig } from '@/types';
 import { FONT_OPTIONS } from '@/lib/fonts';
@@ -12,6 +12,8 @@ interface EditorValue {
   device: Device;
   /** Immutable update by dot-path. Edits to the same path within a moment merge into one undo step. */
   set: (path: string, value: unknown) => void;
+  /** Set when the user clicked something in the preview: sections open and the field is focused */
+  focus: { path: string; n: number } | null;
 }
 const Ctx = createContext<EditorValue | null>(null);
 export const EditorProvider = Ctx.Provider;
@@ -25,9 +27,14 @@ const fieldCls = 'w-full rounded-lg border border-stone-300 bg-white px-2.5 py-1
 
 /* ---------------- layout ---------------- */
 
-export function Section({ title, children, defaultOpen = false }: { title: string; children: ReactNode; defaultOpen?: boolean }) {
+export function Section({ title, children, defaultOpen = false, match = [] }: { title: string; children: ReactNode; defaultOpen?: boolean; match?: string[] }) {
   const [open, setOpen] = useState(defaultOpen);
   const id = useId();
+  const { focus } = useEd();
+  useEffect(() => {
+    if (focus && match.some((m) => focus.path === m || focus.path.startsWith(m))) setOpen(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus]);
   return (
     <section className="border-b border-stone-200">
       <h3>
@@ -54,9 +61,9 @@ export function Group({ title, children }: { title: string; children: ReactNode 
   );
 }
 
-function Row({ label, hint, htmlFor, children, aside }: { label: string; hint?: string; htmlFor?: string; children: ReactNode; aside?: ReactNode }) {
+function Row({ label, hint, htmlFor, children, aside, path }: { label: string; hint?: string; htmlFor?: string; children: ReactNode; aside?: ReactNode; path?: string }) {
   return (
-    <div>
+    <div data-edit-path={path}>
       <div className="mb-1 flex items-center justify-between gap-2">
         <label htmlFor={htmlFor} className="text-xs font-medium text-stone-700">{label}</label>
         {aside}
@@ -74,7 +81,7 @@ export function TextControl({ path, label, multiline, rows = 3, hint, placeholde
   const id = useId();
   const value = String(getIn(config, path) ?? '');
   return (
-    <Row label={label} hint={hint} htmlFor={id}>
+    <Row label={label} hint={hint} htmlFor={id} path={path}>
       {multiline ? (
         <textarea id={id} rows={rows} className={fieldCls} value={value} placeholder={placeholder} onChange={(e) => set(path, e.target.value)} />
       ) : (
@@ -202,7 +209,7 @@ export function ImageControl({ path, label, hint, optional = true }: { path: str
   const [open, setOpen] = useState(false);
   const value = String(getIn(config, path) ?? '');
   return (
-    <Row label={label} hint={hint}>
+    <Row label={label} hint={hint} path={path}>
       <div className="flex items-center gap-3">
         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-stone-200 bg-stone-100">
           {value ? <SmartImage src={value} alt={`${label} preview`} fit="cover" className="h-full w-full" repoHint={config.repo} /> : <div className="flex h-full items-center justify-center text-[10px] text-stone-400">none</div>}
@@ -239,7 +246,7 @@ export function ListControl({ path, label, fields, makeItem, itemTitle, addLabel
     set(path, copy);
   };
   return (
-    <div>
+    <div data-edit-path={path}>
       <p className="mb-2 text-xs font-medium text-stone-700">{label}</p>
       <ul className="space-y-2">
         {items.map((it, i) => (

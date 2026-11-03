@@ -27,10 +27,10 @@ export default function Shop() {
     <section className="sm-section" aria-labelledby="shop-title">
       <div className="sm-container">
         <div className="mb-10 max-w-2xl">
-          <h1 id="shop-title" className="text-[clamp(2.4rem,5vw,4rem)]">
-            All Jackets
+          <h1 id="shop-title" data-edit="pages.shop.title" className="text-[clamp(2.4rem,5vw,4rem)]">
+            {config.pages.shop.title}
           </h1>
-          <p className="mt-4 opacity-70">{config.products.subtitle}</p>
+          {config.pages.shop.intro && <p data-edit="pages.shop.intro" className="mt-4 opacity-70">{config.pages.shop.intro}</p>}
         </div>
 
         <div className="mb-10 flex flex-col gap-4 border-y border-ink/10 py-4 sm:flex-row sm:items-center sm:justify-between">

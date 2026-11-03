@@ -149,11 +149,25 @@
           "title": "Built to last",
           "text": "Reinforced seams, solid hardware and linings chosen for decades of daily wear."
         }
-      ]
+      ],
+      "ctaTitle": "Find your jacket",
+      "ctaButton": "Explore the collection"
     },
     "contact": {
       "title": "Contact Us",
       "intro": "Questions about fit, leather or a specific jacket? Send us a message and we will get back to you."
+    },
+    "home": {
+      "storyButton": "Our story"
+    },
+    "shop": {
+      "title": "All Jackets",
+      "intro": "Every jacket in the collection, made to be worn for years."
+    },
+    "product": {
+      "enquireButton": "Enquire about this jacket",
+      "backLink": "Back to collection",
+      "relatedTitle": "You may also like"
     }
   },
   "layout": {

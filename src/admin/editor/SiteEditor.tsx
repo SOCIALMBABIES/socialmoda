@@ -88,7 +88,27 @@ export default function SiteEditor() {
   }, [hist]);
 
   const set = useCallback((p: string, v: unknown) => hist.set((c) => setIn(c, p, v), p), [hist]);
-  const ctx = useMemo(() => ({ config, device, set }), [config, device, set]);
+  const [focus, setFocus] = useState<{ path: string; n: number } | null>(null);
+  const ctx = useMemo(() => ({ config, device, set, focus }), [config, device, set, focus]);
+
+  // Clicked something in the preview: open its section, scroll to the field and focus it
+  const onPreviewEdit = useCallback((p: string) => {
+    setTab('edit');
+    setFocus({ path: p, n: Date.now() });
+  }, []);
+  useEffect(() => {
+    if (!focus) return;
+    const t = window.setTimeout(() => {
+      const els = Array.from(document.querySelectorAll<HTMLElement>('[data-edit-path]'));
+      const el = els.find((x) => x.dataset.editPath === focus.path);
+      if (!el) return;
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      el.querySelector<HTMLElement>('textarea, input, button')?.focus({ preventScroll: true });
+      el.classList.add('ring-2', 'ring-amber-500', 'rounded-lg');
+      window.setTimeout(() => el.classList.remove('ring-2', 'ring-amber-500', 'rounded-lg'), 1800);
+    }, 80);
+    return () => window.clearTimeout(t);
+  }, [focus]);
 
   const doSaveDraft = () => {
     if (!saveDraft(config)) return toast.error('Could not save the draft: browser storage is full or disabled.');
@@ -190,7 +210,7 @@ export default function SiteEditor() {
         <div className="flex min-h-0 flex-1">
           {/* Controls */}
           <div className={cn('thin-scroll w-full shrink-0 overflow-y-auto border-r border-stone-200 bg-white lg:block lg:w-[380px]', tab === 'edit' ? 'block' : 'hidden')}>
-            <Section title="Branding" defaultOpen>
+            <Section title="Branding" defaultOpen match={['brand.name', 'brand.logo', 'brand.show', 'brand.pageTitle', 'brand.meta', 'brand.favicon', 'brand.currency']}>
               <TextControl path="brand.name" label="Website name" />
               <ImageControl path="brand.logo" label="Logo" hint="Leave empty to show the website name as text." />
               <RangeControl path="brand.logoHeight" label="Logo height" min={16} max={80} unit="px" />
@@ -201,7 +221,7 @@ export default function SiteEditor() {
               <SelectControl path="brand.currency" label="Currency" options={['USD', 'EUR', 'GBP', 'TRY', 'CAD', 'AUD', 'CHF', 'AED'].map((c) => ({ value: c, label: c }))} />
             </Section>
 
-            <Section title="Colours and typography">
+            <Section title="Colours and typography" match={['brand.colors', 'brand.fonts', 'brand.typography']}>
               <Group title="Brand colours">
                 <ColorControl path="brand.colors.primary" label="Main dark colour (buttons, dark sections)" />
                 <ColorControl path="brand.colors.secondary" label="Accent colour (bronze highlights, sale badge)" />
@@ -218,7 +238,7 @@ export default function SiteEditor() {
               </Group>
             </Section>
 
-            <Section title="Header">
+            <Section title="Header" match={['header.']}>
               <SelectControl path="header.logoPosition" label="Logo position" options={[{ value: 'left', label: 'Left' }, { value: 'center', label: 'Centre' }]} />
               <ColorControl path="header.background" label="Background colour" />
               <ColorControl path="header.text" label="Text colour" />
@@ -237,7 +257,7 @@ export default function SiteEditor() {
               />
             </Section>
 
-            <Section title="Hero section">
+            <Section title="Hero section" match={['hero.']}>
               <ImageControl path="hero.image" label="Background image" optional={false} hint="Use a large landscape photo (at least 1600px wide)." />
               <TextControl path="hero.eyebrow" label="Small text above headline" />
               <TextControl path="hero.headline" label="Headline" multiline rows={2} />
@@ -253,7 +273,7 @@ export default function SiteEditor() {
               <ColorControl path="hero.subtitleColor" label="Subtitle colour" />
             </Section>
 
-            <Section title="Product section">
+            <Section title="Product section" match={['products.']}>
               <TextControl path="products.title" label="Section title" />
               <TextControl path="products.subtitle" label="Section subtitle" multiline rows={2} />
               <TextControl path="products.viewAllText" label="“View all” button text" />
@@ -275,9 +295,27 @@ export default function SiteEditor() {
               </Group>
             </Section>
 
-            <Section title="About and Contact pages">
+            <Section title="Page texts (Home, Shop, Product)" match={['pages.home', 'pages.shop', 'pages.product']}>
+              <Group title="Home page">
+                <p className="text-[11px] text-stone-500">The headline, subtitle and button are in “Hero section”; the jackets heading is in “Product section”; the story block uses the About texts below.</p>
+                <TextControl path="pages.home.storyButton" label="Story button text" />
+              </Group>
+              <Group title="Shop page">
+                <TextControl path="pages.shop.title" label="Page title" />
+                <TextControl path="pages.shop.intro" label="Introduction" multiline rows={2} />
+              </Group>
+              <Group title="Product pages">
+                <TextControl path="pages.product.enquireButton" label="Enquiry button text" />
+                <TextControl path="pages.product.backLink" label="Back link text" />
+                <TextControl path="pages.product.relatedTitle" label="Related products heading" />
+              </Group>
+            </Section>
+
+            <Section title="About and Contact pages" match={['pages.about', 'pages.contact']}>
               <TextControl path="pages.about.title" label="About page title" />
               <TextControl path="pages.about.intro" label="About introduction" multiline rows={3} />
+              <TextControl path="pages.about.ctaTitle" label="Closing heading" />
+              <TextControl path="pages.about.ctaButton" label="Closing button text" />
               <TextControl path="pages.about.body" label="About text" multiline rows={8} hint="Leave a blank line between paragraphs." />
               <ImageControl path="pages.about.image" label="About image" />
               <ListControl
@@ -292,7 +330,7 @@ export default function SiteEditor() {
               <TextControl path="pages.contact.intro" label="Contact introduction" multiline rows={3} />
             </Section>
 
-            <Section title="Footer and contact details">
+            <Section title="Footer and contact details" match={['footer.', 'contact.']}>
               <TextControl path="footer.about" label="Footer text" multiline rows={3} />
               <Group title="Contact details">
                 <TextControl path="contact.email" label="Email" hint="Messages from the contact form are sent here." />
@@ -317,7 +355,7 @@ export default function SiteEditor() {
               <TextControl path="footer.copyright" label="Copyright line" hint="{year} becomes the current year." />
             </Section>
 
-            <Section title="Layout and buttons">
+            <Section title="Layout and buttons" match={['layout.']}>
               <RangeControl path="layout.maxWidth" label="Maximum content width" min={960} max={1680} step={20} unit="px" />
               <ResponsiveRange path="layout.pagePadding" label="Page side spacing" min={12} max={80} unit="px" hint="Set separately for each device." />
               <ResponsiveRange path="layout.sectionSpacing" label="Section spacing" min={24} max={200} unit="px" hint="Set separately for each device." />
@@ -337,7 +375,7 @@ export default function SiteEditor() {
 
           {/* Live preview */}
           <div className={cn('min-w-0 flex-1 bg-stone-300 lg:block', tab === 'preview' ? 'block' : 'hidden')}>
-            <PreviewFrame config={config} products={published} device={device} path={path} />
+            <PreviewFrame config={config} products={published} device={device} path={path} onEdit={onPreviewEdit} />
           </div>
         </div>
       </div>

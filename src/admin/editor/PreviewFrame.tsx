@@ -11,13 +11,14 @@ interface Props {
   products: Product[];
   device: Device;
   path: string;
+  onEdit?: (path: string) => void;
 }
 
 /**
  * Live preview: the real storefront runs inside a same-origin iframe, so media queries, fonts and
  * components behave exactly as they will for visitors. The editor streams the unsaved config to it.
  */
-export default function PreviewFrame({ config, products, device, path }: Props) {
+export default function PreviewFrame({ config, products, device, path, onEdit }: Props) {
   const frame = useRef<HTMLIFrameElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -36,11 +37,13 @@ export default function PreviewFrame({ config, products, device, path }: Props) 
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
       if (e.origin !== window.location.origin || e.source !== frame.current?.contentWindow) return;
-      if ((e.data as { type?: string } | null)?.type === 'sm-preview-ready') setReady(true);
+      const d = e.data as { type?: string; path?: string } | null;
+      if (d?.type === 'sm-preview-ready') setReady(true);
+      if (d?.type === 'sm-edit' && typeof d.path === 'string') onEdit?.(d.path);
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, []);
+  }, [onEdit]);
 
   useEffect(() => {
     if (!ready) return;
